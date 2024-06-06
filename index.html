@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon Scraper</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input {
+            width: 300px;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            background: #28a745;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .product {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Amazon Scraper</h1>
+        <input type="text" id="keyword" placeholder="Enter a keyword" />
+        <button onclick="scrapeAmazon()">Search</button>
+        <div class="results" id="results"></div>
+    </div>
+
+    <script>
+        async function scrapeAmazon() {
+            const keyword = document.getElementById('keyword').value;
+            if (!keyword) {
+                alert('Please enter a keyword');
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/scrape?keyword=${keyword}`);
+                const products = await response.json();
+
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = '';
+
+                if (products.length === 0) {
+                    resultsDiv.innerHTML = '<p>No products found.</p>';
+                    return;
+                }
+
+                products.forEach(product => {
+                    const productDiv = document.createElement('div');
+                    productDiv.classList.add('product');
+
+                    productDiv.innerHTML = `
+                        <h2>${product.title}</h2>
+                        <p>Rating: ${product.rating}</p>
+                        <p>Reviews: ${product.reviews}</p>
+                        <img src="${product.image}" alt="${product.title}" width="100">
+                    `;
+
+                    resultsDiv.appendChild(productDiv);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>
